@@ -23,10 +23,12 @@ class Player(pygame.sprite.Sprite):
         self.velocity = pygame.math.Vector2()
         self.mass = 5
         self.terminal_velocity = self.mass * TERMINALVELOCITY
+        self.state = IdleState()
 
         # is grounded?
         self.grounded = True
     def handle_events(self, events):
+        self.state.handle_events(self, events)
         keys = pygame.key.get_pressed()
 
         for event in events:
@@ -141,6 +143,99 @@ class Player(pygame.sprite.Sprite):
         self.handle_events(EventManager.events)
         self.move()
         self.block_handling(EventManager.events)
+        self.state.update(self)
 
         if self.health <= 0:
             self.kill()
+
+class PlayerState:
+    def handle_events(self, player, events):
+        pass
+
+    def update(self, player):
+        pass
+
+class IdleState(PlayerState):
+    def handle_events(self, player, events):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a] or keys[pygame.K_d]:
+            player.state = WalkState()
+        elif keys[pygame.K_SPACE] and player.grounded:
+            player.state = JumpState()
+        elif EventManager.clicked(1):
+            player.state = AttackState()
+
+    def update(self, player):
+        player.velocity.x = 0
+
+class WalkState(PlayerState):
+    def handle_events(self, player, events):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            player.velocity.x = -1
+        elif keys[pygame.K_d]:
+            player.velocity.x = 1
+        elif keys[pygame.K_SPACE] and player.grounded:
+            player.state = JumpState()
+            '''
+            elif run key:
+                player.state = RunState()
+            '''
+        elif EventManager.clicked(1):
+            player.state = AttackState()
+        else:
+            player.state = IdleState()
+
+    def update(self, player):
+        if player.velocity.x > 0:
+            player.velocity.x -= 0.1
+        elif player.velocity.x < 0:
+            player.velocity.x += 0.1
+        if abs(player.velocity.x) < 0.3:
+            player.velocity.x = 0
+
+class RunState(PlayerState):
+    def handle_events(self, player, events):
+        keys = pygame.key.get_pressed()
+        if not keys[pygame.K_a] and not keys[pygame.K_d]:
+            player.state = WalkState()
+        elif keys[pygame.K_SPACE] and player.grounded:
+            player.state = JumpState()
+        elif EventManager.clicked(1):
+            player.state = AttackState()
+
+    def update(self, player):
+        if player.velocity.x > 0:
+            player.velocity.x -= 0.1
+        elif player.velocity.x < 0:
+            player.velocity.x += 0.1
+        if abs(player.velocity.x) < 0.3:
+            player.velocity.x = 0
+        player.velocity.x *= 2  # Double the velocity for running
+
+class JumpState(PlayerState):
+    def handle_events(self, player, events):
+        keys = pygame.key.get_pressed()
+        if not player.grounded:
+            player.state = IdleState()
+        elif keys[pygame.K_a] or keys[pygame.K_d]:
+            player.state = WalkState()
+            '''
+            elif run key:
+                player.state = RunState()
+            '''
+        elif EventManager.clicked(1):
+            player.state = AttackState()
+
+    def update(self, player):
+        player.velocity.y = -PLAYERJUMPPOWER
+
+class AttackState(PlayerState):
+    def handle_events(self, player, events):
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    player.attack()
+
+    def update(self, player):
+        pass  # No update logic for attack state
