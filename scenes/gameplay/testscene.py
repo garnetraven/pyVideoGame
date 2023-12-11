@@ -11,6 +11,13 @@ class TestScene(GamePlaySceneState):
     def __init__(self, game) -> None:
         super().__init__(game)
         self.game = game
+
+        Mob([self.sprites, self.enemy_group], self.textures['zombie_static'], (800, -500), parameters={
+            'block_group':self.blocks,
+            'player':self.player,
+            'damage': 5,
+            'health': 2
+            })
         
         self.gen_world()
 
