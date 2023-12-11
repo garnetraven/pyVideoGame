@@ -3,6 +3,7 @@ from globals import *
 from eventmanager import EventManager
 import math
 import items
+from state import State
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, groups, image: pygame.Surface((TILESIZE*2, TILESIZE*3)), position: tuple, parameters: dict) -> None:
@@ -23,12 +24,12 @@ class Player(pygame.sprite.Sprite):
         self.velocity = pygame.math.Vector2()
         self.mass = 5
         self.terminal_velocity = self.mass * TERMINALVELOCITY
-        self.state = IdleState()
+        self.state_stack = [IdleState()]
 
         # is grounded?
         self.grounded = True
     def handle_events(self, events):
-        self.state.handle_events(self, events)
+        self.state_stack[-1].handle_events(self, events)
         keys = pygame.key.get_pressed()
 
         for event in events:
@@ -36,37 +37,7 @@ class Player(pygame.sprite.Sprite):
                 self.block_handling(event)
                 if event.button == 1:
                     self.attack()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    self.velocity.x = -1
-                if event.key == pygame.K_d:
-                    self.velocity.x = 1
-                if not keys[pygame.K_a] and not keys[pygame.K_d]:
-                    if self.velocity.x > 0:
-                        self.velocity.x -= 0.1
-                    elif self.velocity.x < 0:
-                        self.velocity.x += 0.1
-                        if abs(self.velocity.x) < 0.3:
-                            self.velocity.x = 0
-                if event.key == pygame.K_SPACE and self.grounded:
-                    self.velocity.y = -PLAYERJUMPPOWER
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_a and not keys[pygame.K_d]:
-                    self.velocity.x = 0
-                elif event.key == pygame.K_d and not keys[pygame.K_a]:
-                    self.velocity.x = 0
-                elif event.key == pygame.K_a and keys[pygame.K_d]:
-                    self.velocity.x = 1
-                elif event.key == pygame.K_d and keys[pygame.K_a]:
-                    self.velocity.x = -1
-
-        if EventManager.clicked(1):
-            for enemy in self.enemy_group:
-                distance = abs(math.sqrt((self.rect.x - enemy.rect.x)**2 + (self.rect.y - enemy.rect.y)**2))
-                if enemy.rect.collidepoint(self.get_adjusted_mouse_position()) and (distance < TILESIZE*3):
-                    current_item_name = self.inventory.slots[self.inventory.active_slot].name
-                    if current_item_name in items.items and items.items[current_item_name].use_type == 'weapon':
-                        self.inventory.slots[self.inventory.active_slot].attack(self, enemy)
+            
     def attack(self):
         for enemy in self.enemy_group:
                         distance = abs(math.sqrt((self.rect.x - enemy.rect.x)**2 + (self.rect.y - enemy.rect.y)**2))
@@ -143,12 +114,12 @@ class Player(pygame.sprite.Sprite):
         self.handle_events(EventManager.events)
         self.move()
         self.block_handling(EventManager.events)
-        self.state.update(self)
+        self.state_stack[-1].update(self)
 
         if self.health <= 0:
             self.kill()
 
-class PlayerState:
+class PlayerState(State):
     def handle_events(self, player, events):
         pass
 
@@ -159,11 +130,8 @@ class IdleState(PlayerState):
     def handle_events(self, player, events):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a] or keys[pygame.K_d]:
-            player.state = WalkState()
-        elif keys[pygame.K_SPACE] and player.grounded:
-            player.state = JumpState()
-        elif EventManager.clicked(1):
-            player.state = AttackState()
+            self.exit()
+            player.state_stack.append(WalkState())
 
     def update(self, player):
         player.velocity.x = 0
@@ -171,20 +139,22 @@ class IdleState(PlayerState):
 class WalkState(PlayerState):
     def handle_events(self, player, events):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_a]:
+        if keys[pygame.K_SPACE] and player.grounded:
+            self.exit()
+            player.state_stack.append(JumpState())
+        elif keys[pygame.K_a]:
             player.velocity.x = -1
         elif keys[pygame.K_d]:
             player.velocity.x = 1
-        elif keys[pygame.K_SPACE] and player.grounded:
-            player.state = JumpState()
             '''
             elif run key:
                 player.state = RunState()
+            elif attack key:
+                player.state = AttackState()
             '''
-        elif EventManager.clicked(1):
-            player.state = AttackState()
         else:
-            player.state = IdleState()
+            self.exit()
+            player.state_stack.append(IdleState())
 
     def update(self, player):
         if player.velocity.x > 0:
@@ -215,20 +185,16 @@ class RunState(PlayerState):
 
 class JumpState(PlayerState):
     def handle_events(self, player, events):
-        keys = pygame.key.get_pressed()
-        if not player.grounded:
-            player.state = IdleState()
-        elif keys[pygame.K_a] or keys[pygame.K_d]:
-            player.state = WalkState()
-            '''
-            elif run key:
-                player.state = RunState()
-            '''
-        elif EventManager.clicked(1):
-            player.state = AttackState()
+        pass
 
     def update(self, player):
-        player.velocity.y = -PLAYERJUMPPOWER
+        if not player.grounded:
+            player.velocity.y = -PLAYERJUMPPOWER
+        else:
+            self.exit(player)
+    
+    def exit(self, player):
+        player.velocity.y = 0
 
 class AttackState(PlayerState):
     def handle_events(self, player, events):
@@ -238,4 +204,10 @@ class AttackState(PlayerState):
                     player.attack()
 
     def update(self, player):
-        pass  # No update logic for attack state
+        if EventManager.clicked(1):
+            for enemy in self.enemy_group:
+                distance = abs(math.sqrt((self.rect.x - enemy.rect.x)**2 + (self.rect.y - enemy.rect.y)**2))
+                if enemy.rect.collidepoint(self.get_adjusted_mouse_position()) and (distance < TILESIZE*3):
+                    current_item_name = self.inventory.slots[self.inventory.active_slot].name
+                    if current_item_name in items.items and items.items[current_item_name].use_type == 'weapon':
+                        self.inventory.slots[self.inventory.active_slot].attack(self, enemy)
