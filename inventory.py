@@ -14,11 +14,6 @@ class Inventory:
             self.slots.append(Item())
         self.slots[0] = SwordItem('sword', 1)
         self.slots[1] = ToolItem('pickaxe', 1)
-        self.slots[2] = BlockItem('grass', 5)
-        self.slots[3] = BlockItem('dirt', 3)
-        self.slots[4] = BlockItem('gold', 5)
-        self.slots[5] = BlockItem('wood_log', 5)
-        self.slots[6] = BlockItem('stone', 5)
 
         self.active_slot = 0
         self.current_item = None
