@@ -129,7 +129,10 @@ class PlayerState(State):
 class IdleState(PlayerState):
     def handle_events(self, player, events):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_a] or keys[pygame.K_d]:
+        if keys[pygame.K_SPACE] and player.grounded:
+            self.exit()
+            player.state_stack.append(JumpState())
+        elif keys[pygame.K_a] or keys[pygame.K_d]:
             self.exit()
             player.state_stack.append(WalkState())
 
