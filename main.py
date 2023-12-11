@@ -6,6 +6,10 @@ from scenes.mainmenu.mainmenu import MainMenu
 from eventmanager import EventManager
 from statestack import StateStack
 
+'''
+    # Game class
+    # This class is the main class of the game. It handles the game loop and the game states.
+'''
 class Game:
     def __init__(self):
         pygame.init()
@@ -43,19 +47,17 @@ class Game:
                 break
     
     def run(self):
-        self.game_state_stack.push(MainMenu) # Push the main menu state onto the stack (initial state)
+        self.game_state_stack.push(MainMenu) # Initialize the game state stack with the main menu
 
         # Main game loop
         while self.running:
-            self.handle_events() # Handle events
-            self.update() # Update the game
-            self.draw() # Draw the game
-            self.clock.tick(FPS) # Tick the clock
+            self.handle_events() 
+            self.update() 
+            self.draw() 
+            self.clock.tick(FPS) 
 
-        # Close the game
         self.close()
 
-# Run the game
 if __name__ == "__main__":
     game = Game()
     game.run()
