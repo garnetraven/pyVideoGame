@@ -191,13 +191,11 @@ class JumpState(PlayerState):
         pass
 
     def update(self, player):
-        if not player.grounded:
-            player.velocity.y = -PLAYERJUMPPOWER
-        else:
-            self.exit(player)
-    
+        player.velocity.y = -PLAYERJUMPPOWER
+        self.exit(player)
+
     def exit(self, player):
-        player.velocity.y = 0
+        player.state_stack.pop()
 
 class AttackState(PlayerState):
     def handle_events(self, player, events):
