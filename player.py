@@ -12,8 +12,12 @@ class Player(pygame.sprite.Sprite):
 
         # parameters
         self.group_list, self.textures, self.block_group, self.inventory, self.enemy_group, self.health = (
-            parameters['group_list'], parameters['textures'], parameters['group_list']['block_group'],
-            parameters['inventory'], parameters['group_list']['enemy_group'], parameters['health']
+            parameters['group_list'], 
+            parameters['textures'], 
+            parameters['group_list']['block_group'],
+            parameters['inventory'], 
+            parameters['group_list']['enemy_group'], 
+            parameters['health']
         )
 
         self.velocity = pygame.math.Vector2()
