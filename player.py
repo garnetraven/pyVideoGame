@@ -167,25 +167,6 @@ class WalkState(PlayerState):
         if abs(player.velocity.x) < 0.3:
             player.velocity.x = 0
 
-class RunState(PlayerState):
-    def handle_events(self, player, events):
-        keys = pygame.key.get_pressed()
-        if not keys[pygame.K_a] and not keys[pygame.K_d]:
-            player.state = WalkState()
-        elif keys[pygame.K_SPACE] and player.grounded:
-            player.state = JumpState()
-        elif EventManager.clicked(1):
-            player.state = AttackState()
-
-    def update(self, player):
-        if player.velocity.x > 0:
-            player.velocity.x -= 0.1
-        elif player.velocity.x < 0:
-            player.velocity.x += 0.1
-        if abs(player.velocity.x) < 0.3:
-            player.velocity.x = 0
-        player.velocity.x *= 2  # Double the velocity for running
-
 class JumpState(PlayerState):
     def handle_events(self, player, events):
         pass
