@@ -21,6 +21,6 @@ class StateStack:
     def update(self):
         if self.states:
             self.states[-1].update()
-    def draw(self, screen):
+    def render(self, screen):
         if self.states:
             self.states[-1].render(screen)
