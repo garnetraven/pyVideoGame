@@ -32,12 +32,6 @@ class PauseMenu(State):
                 elif self.main_menu_text_rect.collidepoint(mouse_pos):
                     self.game.game_state_stack.pop()
                     self.game.game_state_stack.change_state(scenes.mainmenu.mainmenu.MainMenu)
-                '''
-                elif self.main_menu_text_rect.collidepoint(mouse_pos):
-                    # Save Data
-                    # Pop all States below
-                    # Push mainmenu state
-                '''
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.game.game_state_stack.pop()
