@@ -49,11 +49,10 @@ class MainMenu(State):
             return False
         
     def update(self):
-        self.handle_events(EventManager.events)
-
-    def render(self, screen):
         self.draw()
+        self.handle_events(EventManager.events)
         pygame.display.update()
+
 
     def draw(self):
         self.screen.fill('grey')
