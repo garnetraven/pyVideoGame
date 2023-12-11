@@ -60,7 +60,6 @@ class Player(pygame.sprite.Sprite):
 
         if EventManager.clicked(1):
             for enemy in self.enemy_group:
-                print('left click')
                 distance = abs(math.sqrt((self.rect.x - enemy.rect.x)**2 + (self.rect.y - enemy.rect.y)**2))
                 if enemy.rect.collidepoint(self.get_adjusted_mouse_position()) and (distance < TILESIZE*3):
                     current_item_name = self.inventory.slots[self.inventory.active_slot].name
