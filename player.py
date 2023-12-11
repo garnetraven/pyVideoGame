@@ -34,6 +34,14 @@ class Player(pygame.sprite.Sprite):
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.block_handling(event)
+            
+    def attack(self):
+        for enemy in self.enemy_group:
+                        distance = abs(math.sqrt((self.rect.x - enemy.rect.x)**2 + (self.rect.y - enemy.rect.y)**2))
+                        if enemy.rect.collidepoint(self.get_adjusted_mouse_position()) and (distance < TILESIZE*3):
+                            current_item_name = self.inventory.slots[self.inventory.active_slot].name
+                            if current_item_name in items.items and items.items[current_item_name].use_type == 'weapon':
+                                self.inventory.slots[self.inventory.active_slot].attack(self, enemy)
     def move(self):
         self.velocity.y += GRAVITY * self.mass
         # terminal velocity check
