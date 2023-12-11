@@ -29,7 +29,7 @@ class Game:
         self.game_state_stack.update() # Update the state stack
     
     def draw(self):
-        self.game_state_stack.draw(self.screen) # Render the state stack
+        self.game_state_stack.render(self.screen) # Render the state stack
         pygame.display.update() # Update the display
 
     def close(self):
