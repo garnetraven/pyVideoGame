@@ -12,5 +12,3 @@ class State:
         pass
     def draw(self):
         pass
-    def render(self, screen):
-        pass
