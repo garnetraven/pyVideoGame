@@ -70,6 +70,12 @@ class TestScene(GamePlaySceneState):
                 if event.key == pygame.K_ESCAPE:
                     self.game.game_state_stack.push(PauseMenu)
                     return True
+            '''
+            elif event.type == _blank_:
+                # Save Data
+                # Pop all States below
+                # Push mainmenu state
+            '''
             return False
         
     def update(self):
