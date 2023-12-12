@@ -68,6 +68,7 @@ class TestScene(GamePlaySceneState):
         
     def update(self):
         self.handle_events(EventManager.events)
+        self.animate()
         self.sprites.update()
         self.inventory.update()
         self.player_stats.update()
