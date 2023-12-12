@@ -8,6 +8,9 @@ atlas_texture_data = {
     'gold':{'type':'block', 'size':(TILESIZE, TILESIZE), 'position': (4, 0)},
     'silver':{'type':'block', 'size':(TILESIZE, TILESIZE), 'position': (5, 0)}
 }
+player_texture_data = {
+    'player_static':{'type':'player', 'file_path':'assets/player.png', 'size':(TILESIZE*2, TILESIZE*3)},
+}
 solo_texture_data = {
     'player_static':{'type':'player', 'file_path':'assets/player.png', 'size':(TILESIZE*2, TILESIZE*3)},
     'zombie_static':{'type':'enemy', 'file_path':'assets/zombie.png', 'size':(TILESIZE*2, TILESIZE*3)},
