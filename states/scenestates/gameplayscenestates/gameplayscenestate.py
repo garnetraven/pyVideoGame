@@ -40,7 +40,10 @@ class GamePlaySceneState(SceneState):
                                           'group_list': self.group_list,
                                           'textures': self.textures,
                                           'inventory': self.inventory,
-                                          'health': 100
+                                          'health': 100,
+                                          'idle_frames': self.idle_frames,
+                                          'walk_frames': self.walk_frames,
+                                          'jump_frames': self.jump_frames
                                       })
         self.player = self.game.player
 
@@ -67,12 +70,30 @@ class GamePlaySceneState(SceneState):
         
         return textures
     
+    def animate(self):
+        FRAME_RATE = 10  # Adjust this value to control the speed of the animation
+
+        # Animate player
+        self.player.frame_counter += 1
+        if self.player.frame_counter >= FRAME_RATE:
+            self.player.frame_counter = 0
+            self.player.current_frame = (self.player.current_frame + 1) % len(self.player.frames)
+            self.player.image = self.player.frames[self.player.current_frame]
+
+        # Animate enemies
+        for enemy in self.enemy_group:
+            enemy.frame_counter += 1
+            if enemy.frame_counter >= FRAME_RATE:
+                enemy.frame_counter = 0
+                enemy.current_frame = (enemy.current_frame + 1) % len(enemy.frames)
+                enemy.image = enemy.frames[enemy.current_frame]
+
     def enter(self):
         pass
     def exit(self):
         pass
     def update(self):
-        pass
+        self.animate()
     def handle_events(self, events):
         pass
     def draw(self):
