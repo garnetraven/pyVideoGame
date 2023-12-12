@@ -18,8 +18,12 @@ class Player(pygame.sprite.Sprite):
             parameters['group_list']['block_group'],
             parameters['inventory'], 
             parameters['group_list']['enemy_group'], 
-            parameters['health']
+            parameters['health'],
+            parameters['idle_frames'],
+            parameters['walk_frames'],
+            parameters['jump_frames']
         )
+        self.frames = self.idle_frames[0]
 
         self.velocity = pygame.math.Vector2()
         self.mass = 5
@@ -124,6 +128,9 @@ class PlayerState(State):
         pass
 
 class IdleState(PlayerState):
+    def enter(self, player):
+        player.frames = player.idle_frames
+
     def handle_events(self, player, events):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and player.grounded:
@@ -137,6 +144,8 @@ class IdleState(PlayerState):
         player.velocity.x = 0
 
 class WalkState(PlayerState):
+    def enter(self, player):
+        player.frames = player.walk_frames
     def handle_events(self, player, events):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and player.grounded:
@@ -165,6 +174,8 @@ class WalkState(PlayerState):
             player.velocity.x = 0
 
 class JumpState(PlayerState):
+    def enter(self, player):
+        player.frames = player.jump_frames
     def handle_events(self, player, events):
         pass
 
