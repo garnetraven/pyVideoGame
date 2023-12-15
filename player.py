@@ -11,7 +11,8 @@ class Player(pygame.sprite.Sprite):
         self.image = image
         self.rect = self.image.get_rect(topleft=position)
 
-        # parameters
+        # Parameters
+        # Unpacking parameters from the parameters dictionary
         self.group_list, self.textures, self.block_group, self.inventory, self.enemy_group, self.health = (
             parameters['group_list'], 
             parameters['textures'], 
@@ -23,16 +24,16 @@ class Player(pygame.sprite.Sprite):
             parameters['walk_frames'],
             parameters['jump_frames']
         )
-        self.frames = self.idle_frames[0]
+        self.frames = self.idle_frames[0] # The player's current animation frame
 
-        self.velocity = pygame.math.Vector2()
+        self.velocity = pygame.math.Vector2() # The player's velocity vector
         self.mass = 5
         self.terminal_velocity = self.mass * TERMINALVELOCITY
         self.state_stack = [IdleState()]
 
-        # is grounded?
-        self.grounded = True
+        self.grounded = True # Whether or not the player is on the ground
     def handle_events(self, events):
+        # Handle events for the current state
         self.state_stack[-1].handle_events(self, events)
         
         for event in events:
@@ -40,6 +41,7 @@ class Player(pygame.sprite.Sprite):
                 self.block_handling(event)
             
     def attack(self):
+        # Attack enemies within range
         for enemy in self.enemy_group:
                         distance = abs(math.sqrt((self.rect.x - enemy.rect.x)**2 + (self.rect.y - enemy.rect.y)**2))
                         if enemy.rect.collidepoint(self.get_adjusted_mouse_position()) and (distance < TILESIZE*3):
